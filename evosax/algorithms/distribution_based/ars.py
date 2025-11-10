@@ -116,7 +116,7 @@ class ARS(DistributionBasedAlgorithm):
         grad = jnp.dot(delta, z[elite_idx]) / (self.num_elites * fitness_std)
 
         # Update mean
-        updates, opt_state = self.optimizer.update(grad, state.opt_state)
+        updates, opt_state = self.optimizer.update(grad, state.opt_state, state.mean)
         mean = optax.apply_updates(state.mean, updates)
 
         return state.replace(

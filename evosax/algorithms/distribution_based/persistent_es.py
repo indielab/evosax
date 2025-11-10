@@ -103,7 +103,7 @@ class PersistentES(DistributionBasedAlgorithm):
         grad = jnp.dot(fitness, state.pert_accum) / state.std**2 / self.population_size
 
         # Update mean
-        updates, opt_state = self.optimizer.update(grad, state.opt_state)
+        updates, opt_state = self.optimizer.update(grad, state.opt_state, state.mean)
         mean = optax.apply_updates(state.mean, updates)
 
         # Update inner step counter
