@@ -38,7 +38,7 @@ for i in range(num_generations):
     fitness = ...
 
     # Update the evolution strategy
-    state = es.tell(key, population, fitness, state, params)
+    state, metrics = es.tell(key, population, fitness, state, params)
 
 # Get best solution
 state.best_solution, state.best_fitness
