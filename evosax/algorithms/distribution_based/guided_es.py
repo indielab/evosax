@@ -142,7 +142,7 @@ class GuidedES(DistributionBasedAlgorithm):
         grad = params.beta * jnp.dot(delta, z_plus) / (2 * state.std**2)
 
         # Update mean
-        updates, opt_state = self.optimizer.update(grad, state.opt_state)
+        updates, opt_state = self.optimizer.update(grad, state.opt_state, state.mean)
         mean = optax.apply_updates(state.mean, updates)
 
         return state.replace(

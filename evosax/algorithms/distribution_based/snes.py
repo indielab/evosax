@@ -97,7 +97,9 @@ class SNES(xNES):
         grad_mean = -state.std * jnp.dot(fitness, z)
 
         # Update mean
-        updates, opt_state = self.optimizer.update(grad_mean, state.opt_state)
+        updates, opt_state = self.optimizer.update(
+            grad_mean, state.opt_state, state.mean
+        )
         mean = optax.apply_updates(state.mean, updates)
 
         # Compute grad for std

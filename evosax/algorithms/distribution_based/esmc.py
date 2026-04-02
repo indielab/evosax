@@ -111,7 +111,7 @@ class ESMC(DistributionBasedAlgorithm):
         grad = jnp.dot(delta, z_plus) / int((self.population_size - 1) / 2)
 
         # Update mean
-        updates, opt_state = self.optimizer.update(grad, state.opt_state)
+        updates, opt_state = self.optimizer.update(grad, state.opt_state, state.mean)
         mean = optax.apply_updates(state.mean, updates)
 
         return state.replace(

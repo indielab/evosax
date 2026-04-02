@@ -99,7 +99,7 @@ class SimpleES(DistributionBasedAlgorithm):
         grad = -jnp.dot(fitness, population - state.mean)
 
         # Update mean
-        updates, opt_state = self.optimizer.update(grad, state.opt_state)
+        updates, opt_state = self.optimizer.update(grad, state.opt_state, state.mean)
         mean = optax.apply_updates(state.mean, updates)
 
         # Update std

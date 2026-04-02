@@ -2,7 +2,8 @@
 
 import jax
 import jax.numpy as jnp
-from evosax.algorithms.distribution_based import distribution_based_algorithms
+import optax
+from evosax.algorithms.distribution_based import Open_ES, distribution_based_algorithms
 
 
 def test_run(
@@ -201,3 +202,31 @@ def test_base_api(
     metrics = algo.metrics_fn(subkey, population, fitness, state, params)
     assert "best_fitness" in metrics
     assert "best_solution" in metrics
+
+
+def test_open_es_runs_with_adamw_optimizer(key, population_size, bbob_problem):
+    """Open_ES should support optimizers that require the current params."""
+    solution = bbob_problem.sample(key)
+    algo = Open_ES(
+        population_size=population_size,
+        solution=solution,
+        optimizer=optax.adamw(learning_rate=1e-3, weight_decay=1e-4),
+    )
+    params = algo.default_params
+
+    key, subkey = jax.random.split(key)
+    mean_init = bbob_problem.sample(subkey)
+
+    key, subkey = jax.random.split(key)
+    state = algo.init(subkey, mean_init, params)
+
+    key, subkey = jax.random.split(key)
+    problem_state = bbob_problem.init(subkey)
+
+    key, key_ask, key_tell = jax.random.split(key, 3)
+    population, state = algo.ask(key_ask, state, params)
+    fitness, problem_state, _ = bbob_problem.eval(key_tell, population, problem_state)
+    state, metrics = algo.tell(key_tell, population, fitness, state, params)
+
+    assert jnp.all(jnp.isfinite(state.mean))
+    assert jnp.isfinite(metrics["best_fitness"])
