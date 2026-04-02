@@ -44,6 +44,32 @@ for i in range(num_generations):
 state.best_solution, state.best_fitness
 ```
 
+Population-based algorithms such as `SimpleGA` use the same `ask`-`tell` loop, but their state is initialized from an explicit initial population and its fitness:
+
+```python
+import jax
+import jax.numpy as jnp
+from evosax.algorithms import SimpleGA
+
+
+key = jax.random.key(0)
+solution = dummy_solution
+ga = SimpleGA(population_size=32, solution=solution)
+params = ga.default_params
+
+# Replicate a template solution (or provide your own evaluated population).
+population_init = jax.tree.map(
+    lambda x: jnp.repeat(x[None, ...], ga.population_size, axis=0),
+    solution,
+)
+fitness_init = ...
+
+# Initialize state from the initial population and its fitness.
+state = ga.init(key, population_init, fitness_init, params)
+```
+
+The `fitness_init` argument seeds the stored population ranking used by the first `ask(...)` call. After initialization, `ga.ask(...)` returns the next population to evaluate and `ga.tell(...)` updates the algorithm state with the evaluated population and fitness.
+
 ## Implemented Evolution Strategies 🦎
 
 | Strategy                    | Reference                                                                                                                                                | Import                                                                                                   | Example |
